@@ -1,7 +1,15 @@
 # GraphJS
 
+GraphJS is a framework for representing mathematical graphs in JavaScript, inspired by the popular <a href='http://networkx.lanl.gov'>NetworkX</a> library for Python. 
 
-GraphJS is a framework for representing Mathematical Graphs in JavaScript. It provides lightweight graph classes can be extended for applications like representing Chemical Structures, Social Networks, Condensed Matter Physics, and just about anything and everything that can be represented as an abstract group of interconnected nodes.
+## Features
+
+- Nodes can represent anything (e.g. text, atoms, people)
+- Edges can hold arbitrary data (e.g. weights, distances)
+- Standard graph algorithms included
+- API is similar to NetworkX, with support for core classes and algorithms.
+- Works in Node.JS and Browser
+- Open-source BSD License
 
 <table>
 	<tr>
@@ -17,48 +25,75 @@ GraphJS is a framework for representing Mathematical Graphs in JavaScript. It pr
 
 </table>
 
-GraphJS is designed to be as lightweight as possible. It can be extended easily to provide visualization/drawing capabilities.
+## Usage
 
-## Documentation:
+node.js:
 
-Proper documentation coming soon.
+```
+npm install GraphJS
+GraphJS = require('GraphJS');
+```
+
+browser:
+```html
+<script src='graphjs-browser.min.js'></script>
+<script>
+	var g = GraphJS.Graph();
+</script>
+```
+No external dependencies are required.
 
 ### GraphJS.structures
-Choose between 1 of 4 Graph types:
+Choose which type of graph is best suited for your application:
 
 - `Graph`: undirected graph with self-loops (basic)
 - `DiGraph`: directed graph with self-loops
 - `MultiGraph`: undirected graphs with self loops and parallel edges
 - `MultiDiGraph`: directed graph with self loops and parallel edges
 
-
 ### Inheriting Graphs
-Suppose you wanted to represent a social network by superclassing GraphJS (or more precisely, prototype-chaining). Social Networks connect people (nodes) through relationships (edges). Here is one way you can extend GraphJS.
+Modeling a social network is easy:
 
 ```JavaScript
 
-function SocialNetwork() {
+var SocialNetworkClass = function() {
+	// redefining nodes as people and edges as relationships
 	this.people = this.node;
-	this.relationships = this.adj;
-};
+	this.relationships = this.adj;	
+}
 SocialNetwork.prototype = new GraphJS.classes.Graph();
-SocialNetwork.prototype.constructor = SocialNetwork;//remember to reset the constructor so you don't call the GraphJS constructor
-
+SocialNetwork.prototype.constructor = SocialNetwork;
 var exampleNetwork = new SocialNetwork();
 
 ```
 
-### Missing Features
+## GraphJS-NetworkX Compatibility Chart
 
-- Stuff hasn't really been tested yet.
-- No iterables
+<!-- TODO!! -->
 
-### Developers
+## How You Can Help
 
-1. fork my repo
-2. Read <a href='http://networkx.lanl.gov'>NetworkX documentation</a> to understand GraphJS's desired architecture
-3. Implement whatever Graph Algorithm interests you
-4. Submit a pull request with a test case.
-5. I love you.
+GraphJS is developed in my spare time, and usually out of necessity for a graph algorithm or two in some other project of mine. 
+You can support this project in several ways:
 
-
+1. File issues, bug reports, feature requests.
+2. Contribute Code! 
+	- Source code is written in CoffeeScript, which is syntactically similar to Python.
+	- Read <a href='http://networkx.lanl.gov'>NetworkX documentation</a> to understand GraphJS's desired architecture. 
+	- Implement a feature or two and submit a pull request.
+3. You can buy me a coffee! Here is a bitcoin donation link:
+<script src="http://coinwidget.com/widget/coin.js"></script>
+<script>
+CoinWidgetCom.go({
+	wallet_address: "1MLX2kMhTSRiq3Uz7R2JsECreuQEmofQy6"
+	, currency: "bitcoin"
+	, counter: "hide"
+	, alignment: "bl"
+	, qrcode: true
+	, auto_show: false
+	, lbl_button: "Donate"
+	, lbl_address: "My Bitcoin Address:"
+	, lbl_count: "donations"
+	, lbl_amount: "BTC"
+});
+</script>

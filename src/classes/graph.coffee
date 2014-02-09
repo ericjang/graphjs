@@ -1,370 +1,344 @@
-class GraphJS.Graph
+# Base class for undirected graphs.
+# The Graph class allows any hashable object as a node
+# and can associate key/value attribute pairs with each undirected edge.
+# Self-loops are allowed but multiple edges are not (see MultiGraph).
+# For directed graphs see DiGraph and MultiDiGraph.
+
+#    Copyright (C) 2013-2014 by
+#    Eric Jang <eric_jang@brown.edu>
+#    All rights reserved.
+#    BSD license.
+
+convert = require('../convert')
+helpers = require('../helpers')
+
+class Graph
+  # Base class for undirected graphs.
+  #   A Graph stores nodes and edges with optional data, or attributes.
+  #   Graphs hold undirected edges.  Self loops are allowed but multiple
+  #   (parallel) edges are not.
+
+  #   Nodes can be arbitrary (hashable) Python objects with optional
+  #   key/value attributes.
+
+  #   Edges are represented as links between nodes with optional
+  #   key/value attributes.
+
+  #   Parameters
+  #   ----------
+  #   data : input graph
+  #       Data to initialize graph.  If data=None (default) an empty
+  #       graph is created.  The data can be an edge list, or any
+  #       NetworkX graph object.  If the corresponding optional Python
+  #       packages are installed the data can also be a NumPy matrix
+  #       or 2d ndarray, a SciPy sparse matrix, or a PyGraphviz graph.
+  #   attr : keyword arguments, optional (default= no attributes)
+  #       Attributes to add to graph as key=value pairs.
   constructor: (data=null, attr={}) ->
     @.graph = {}
     @.node = {}
     @.adj = {}
-    if data isnt null then convert.to_graphjs_graph data , @
-    update @.graph, attr#we use our helper function
+    if data isnt null
+      convert.to_graphjs_graph(data , @)  # this isn't implemented quite yet
+    helpers.update @.graph, attr
     @.edge = @.adj
-    return @
 
-  #I don't know how to implement len, iter, str methods... :(
-  add_node : (n, attr_dict=null, attr={}) ->
-    if attr_dict is null
-      attr_dict = attr
+  name : (s) ->
+    if s is undefined
+      @graph.name
     else
+      @graph.name = out
+
+  add_node : (n, attr_dict=null, attr={})->
+    # add a single node n and update node attributes
+    if actr_dict is null 
+      attr_dict = attr
+    else 
       try
-        update attr_dict, attr
-      catch error
-        console.log "attr_dict argument must be a dictionary"
+        helpers.update attr_dict, attr  
+      catch
+        console.log 'attr_dict must be a dictionary!'
     if n not of @.node
       @.adj[n] = {}
       @.node[n] = attr_dict
     else
-      update @.node[n], attr_dict
+      helpers.update @.node[n], attr_dict
 
-  add_nodes_from : (nodes, attr={}) ->
-    ###
-    adds multiple nodes
-    Due to JavaScript's different comprehension style, I was forced to implement this differently
-    than NetworkX
 
-    Can take two formats:
-
-    array of
-    [[node,dict],[node,dict],[node,dict]] pairs (faking tuples)
-
-    or
-
-    {
-      'node':dict,
-      'node':dict,
-      etc.
-    }
-    ###
-    if typeIsArray nodes
-      #presuming [[node,dict],[node,dict],[node,dict]] pairs
-      for i, pair of nodes
-        if pair[0] not of @.node
-          @.adj[pair[0]] = {}
-          newdict = clone attr
-          update newdict, pair[1]
-          @.node[pair[0]] = newdict
-        else
-          olddict = @.node[pair[0]]
-          update olddict, attr
-          update olddict, pair[1]
-    else
-      #presuming {'node':dict,'node':dict} style
-      for nn, ndict of nodes
-        if nn not of @.node
-          @.adj[nn] = {}
-          newdict = clone attr
-          update newdict, ndict
-          @.node[nn] = newdict
-        else
-          olddict = @.node[nn]
-          update olddict, attr
-          update olddict, ndict
-
+  add_nodes_from : (nodes, attr={})->
+    # add multiple nodes
+    for n in nodes
+      @.add_node(n, attr)
 
   remove_node : (n) ->
-      ###
-      removes node n
-      ###
-      adj = @.adj
-      try
-        nbrs = (key for key of adj[n])
-        delete @.node[n]
-        for i,u of nbrs#removes all edges n->u in graph
-          delete adj[u][n]
-        delete adj[n]
-      catch error
-        console.log "The node %s is not in the graph.", n
-
-  remove_nodes_from : (nodes) ->
-      ###
-      removes multiple nodes
-
-      nodes is presumed to be an array
-      ###
-      adj = @.adj
-      for i,n of nodes
-        try
-          delete @.node[n]
-          for u of adj[n]
-            delete adj[u][n]
-          delete adj[n]
-        catch error
-          continue
+    # removes node n and all adjacent edges
+    try
+      helpers.del @node, n
+      for u in helpers.keys(@adj[n])
+        helpers.del @adj[u][n]
+      helpers.del @adj[n]
+    catch error
+      console.log error
 
   nodes : (data=false) ->
-      #returns list of nodes in graph
-      if data
-        ([node,node_data] for node,node_data of @.node)
-      else
-        (node for node of @.node)
+    # returns list of nodes in graph
+    # if data is true, then 
+    if data
+      arr = helpers.keys @nodes
+    else
+      arr = helpers.items @nodes
 
-  number_of_nodes : () ->
-      #returns number of nodes in graph
-      #use our custom list function. Be careful!
-      (_list @.node).length
 
-  order : () ->
-    #identical to number_of_nodes
-    @.number_of_nodes @.node
+  number_of_nodes : ->
+    helpers.keys(@node).length
+
+  order : ->
+    number_of_nodes()
 
   has_node : (n) ->
-    #returns true if graph contains node n
-    return n of @.node
+    # returns true if n is a node
+    # false otherwise
+    n of @node
 
-  add_edge : (u, v, attr_dict=null, attr={}) ->
-    ###
-    adds edge between u, v
-    ###
+  add_edge : (u,v,attr_dict=null, attr={}) ->
+    # add an edge between nodes u and v
+    # u and v will automatically be added
+    # if they are not already in the graph
+    # edge attributes can be specified with attrs
+    # G.add_edge(1,2,weight=3)
+    # G.add_edge(1,2,{'foo':1})
+
+    # set up attribute dictionary
     if attr_dict is null
       attr_dict = attr
     else
       try
-        update attr_dict attr
-      catch error
-        console.log "attr_dict argument must be a dictionary."
-    #add nodes (if necessary)
-    if u not of @.node
-      @.adj[u] = {}
-      @.node[u] = {}
-    if v not of @.node
-      @.adj[v] = {}
-      @.node[v] = {}
-    #add the edge
-    datadict = @.adj[u][v] || {}#hack around the dict get function
-    update datadict, attr_dict
-    @.adj[u][v] = datadict
-    @.adj[v][u] = datadict
+        helpers.update attr_dict attr
+      catch e
+        console.log "The attr_dict argument must be a dictionary."
+    # add nodes
+    if u not of @node
+      @adj[u] = {}
+      @node[u] = {}
+    if v not of @node
+      @adj[v] = {}
+      @node[v] = {}
+    # add the edge
+    datadict = helpers.get @adj[u], v, {}
+    helpers.update datadict, attr_dict
+    @adj[u][v] = datadict
+    @adj[v][u] = datadict
 
   add_edges_from : (ebunch, attr_dict=null, attr={}) ->
-    ###
-    Add all edges in ebunch
-    i.e. [['A','B'],[1,'2'],['node','foobar',{'key':'value'}]]
-    ###
+    # add the edges in ebunch
+    # ebunch : container of edges
+    #         Each edge given in the container will be added to the
+    #         graph. The edges must be given as as 2-tuples (u,v) or
+    #         3-tuples (u,v,d) where d is a dictionary containing edge
+    #         data.
+    #     attr_dict : dictionary, optional (default= no attributes)
+    #         Dictionary of edge attributes.  Key/value pairs will
+    #         update existing data associated with each edge.
+    #     attr : keyword arguments, optional
+    #         Edge data (or labels or objects) can be assigned using
+    #         keyword arguments.
+
     if attr_dict is null
       attr_dict = attr
     else
       try
-        update attr_dict attr
-      catch error
-        console.log "attr_dict argument must be a dictionary."
-    #process ebunch
-    for i,e of ebunch
-      switch e.length
-        when 3
-          u = e[0]
-          v = e[1]
-          dd = e[2]
-        when 2
-          u = e[0]
-          v = e[1]
-          dd = {}
-        else console.log "Edge tuple %s must be a 2-array or a 3-array", e
-      if u not of @.node
-        @.adj[u] = {}
-        @.node[u] = {}
-      if v not of @.node
-        @.adj[v] = {}
-        @.node[v] = {}
-      datadict = @.adj[u][v] || {}
-      update datadict, attr_dict
-      update datadict, dd
-      @.adj[u][v] = datadict
-      @.adj[v][u] = datadict
+        helpers.update attr_dict attr
+      catch e
+        console.log "The attr_dict argument must be a dictionary."
+    # process ebunch
+    for e in ebunch
+      ne = e.length
+      switch ne
+        when 3 then [u,v,dd] = e
+        when 2 then [u,v,dd] = [e,{}]
+        else
+          console.log "each edge must be a 2-array or 3-array"
+      if u not of @node
+        @adj[u] = {}
+        @node[u] = {}
+      if v not of @node
+        @adj[v] = {}
+        @node[v] = {}
+      datadict = helpers.get @adj[u], v, {}
+      helpers.update datadict, attr_dict
+      helpers.update datadict, dd
+      @adj[u][v] = datadict
+      @adj[v][u] = datadict
 
   add_weighted_edges_from : (ebunch, weight='weight', attr={}) ->
-    ###
-    add all edges in ebunch as weighted edges with specified weights
-    ###
-    @.add_edges_from ([e[0],e[1],{weight:e[2]}] for i,e of ebunch), null, attr
+    # adds all the edges in ebunch as weighted edges with specified weights
+    @add_edges_from ([u,v,{weight:d}] for [u,v,d] in ebunch), attr
 
   remove_edge : (u,v) ->
-    if @.adj[u] and @.adj[u][v]
-      delete @.adj[u][v]
-      #self-loop only needs one entry removed
-      if u is not v
-        del @.adj[v][u]
-    else
-      console.log "The edge %s-%s is not in the graph", u, v
+    # removes the edge between u and v
+    try
+      helpers.del @adj[u][v]
+      if u isnt v
+        # self-loop only needs one entry removed
+        helpers.del adj[v][u]
+    catch e
+      console.log "edge %s-%s is not in graph", u,v
+    
+  remove_edges_from : (ebunch) ->
+    # removes all edges specified in ebunch
+    for e in ebunch
+      [u,v] = e[0...2] # ignore edge data if present
+      if u of @adj and v of @adj[u]
+        helpers.del @adj[u], v
+        if u isnt v # self-loops only need one entry removed
+          helpers.del @adj[v], u
 
   has_edge : (u,v) ->
-    return v of @.adj[u]
+    # returns true if edge u,v is in graph
+    v of @adj[u]
 
   neighbors : (n) ->
-    ###
-    returns list of nodes connected to node n
-    ###
-    try
-      return (key for key of @.adj[n])
-    catch error
-      console.log "Then node %s is not in the graph", n
+    # returns list of nodes connected to n
+    helpers.keys @adj[n]
 
   edges : (nbunch=null, data=false) ->
-    ###
-    returns list of edges
-
-    edges returns as arrays with optional data in order of [node, neighbor, data]
-    nbunch = optional array of desired nodes. defaults to all nodes.
-
-    the structure of node_nbrs in networkx's implementation again, poses
-    weird problems with array comprehension.
-
-    I will write a custom implementation.
-
-    ###
-
-
-    arr = []#this is the array we stick results in
-
-    seen = {}
+    # returns list of edges
+    # edges returned as arrays with optional data
+    # in the order [node, neighbor, data]
+    seen = {} # helper dict to keep track of multiply stored edges
     if nbunch is null
-      node_nbrs = _items @.adj
-      #node_nbrs looks like [('foobar', {}), ('adventure', {})]
+      nodes_nbrs = helpers.items @adj
     else
-      node_nbrs = ([n,@.adj[n]] for i,n of nbunch)
-    console.log 'neigh!'
-    console.log node_nbrs
-    if data
-      for i, a of node_nbrs
-        n = a[0]
-        nbrs = a[1]
-        for j, b of _items nbrs
-          nbr = b[0]
-          data = b[1]
+      nodes_nbrs = ([n,@adj[n]] for n in helpers.keys(nbunch))
+    for [n,nbrs] in nodes_nbrs
+        for own nbr, data of nbrs
           if nbr not of seen
-            arr.push [n,nbr,data]
-        seen[n] = 1
-    else
-      for i,a of node_nbrs
-        n = a[0]
-        nbrs = a[1]
-        for nbr of nbrs
-          if nbr not of seen
-            arr.push [n,nbr]
-        seen[n] = 1
-    arr
+            if data
+              seen[n] = [n,nbr,data]
+            else
+              seen[n] = [n,nbr]
+    helpers.items seen
+
+  get_edge_data : (u,v,_default=null) ->
+    # returns attribute dictionary associated with edge u-v
+    try
+      @adj[u][v]
+    catch e
+      _default
+  
+  adjacency_list : ->
+    # returns adjacency list representation of the graph
+    # returned in order of @nodes()
+    (helpers.keys(edgedict) for edgedict in helpers.values(@adj))
 
   degree : (nbunch=null, weight=null) ->
-    ###
-    return the degree of a node or nodes (number of edges adjacent to the node)
-    nbunch default = all nodes
-
-    because iterators not supported, returns array of node-degree array pairs
-    ###
-    arr= []
+    # return degree of a node or nodes
+    # nbunch = iterable list of nodes. default = all nodes
     if nbunch is null
-      node_nbrs = _items @.adj
+      node_nbrs = helpers.items @adj
     else
-      node_nbrs = ([n,@.adj[n]] for i,n of nbunch)
-
+      node_nbrs = ([n, @adj[n]] for n in helpers.keys(nbunch))
     if weight is null
-      for i,a of node_nbrs
-        n = a[0]
-        nbrs = a[1]
-        arr.push [n,len(nbrs) + (n of nbrs)]#1 + true == 2
+      degrees = ([n, helpers.len(nbr) + (n of nbrs)] for own n,nbrs of node_nbrs)
     else
-      #edge weighted graph - degree is sum of nbr edge weights
-      for i,a of node_nbrs
-        n=a[0]
-        nbrs = a[1]
-        #TODO: make sure this is working
-        arr.push [n, _sum(nbrs[nbr][weight] || 1 for nbr of nbrs) + (n of nbrs and nbrs[n][weight] || 1)]
+      # edge-weighted graph - degree is sum of nbr edge weights
+      degrees = []
+      for own n, nbrs of node_nbrs
+        sum = 0
+        for own nbr, edgedata of nbrs
+          sum += helpers.get edgedata, weight, 1
+        degrees.push [n, sum]
+      degrees
 
-  clear : () ->
-    #removes all nodes and edges from the graph
-    #also removes name, and all node, graph, edge attributes
-    @.name = ''
-    @.adj = {}
-    @.node = {}
-    @.graph = {}
+  clear : ->
+    # removes all nodes and edges from the graph
+    @name = ''
+    @adj = {}
+    @node = {}
+    @graph = {}
+  
+  copy : ->
+    # returns a copy of the graph
+    helpers.deepcopy @
 
-  copy : () ->
-    #returns copy of graph
-    clone @
-
-  is_multigraph : () ->
+  is_multigraph : ->
     false
 
-  is_directed : () ->
+  is_directed : ->
     false
 
-  to_directed : () ->
-    ###
-    returns a directed representation of graph
-    ###
-    G = new GraphJS.DiGraph
-    G.name = @.name
-    g.add_nodes_from(@)
-    G.add_edges_from ([u,v,clone data] for u,nbrs of (_items @.adj) for v,data of (_items nbrs))
-    G.graph = clone @.graph
-    G.node = clone @.node
-    G
+  # to_directed : ->
+  #   # return a directed representation of the graph
+  #   # TODO
 
-  to_undirected : () ->
-    clone @
+  to_undirected : ->
+    helpers.deepcopy @
 
   subgraph : (nbunch) ->
-    ###
-    return subgraph induced on nodes in nbunch
-    ###
-    console.log 'TODO: implement this!'
+    # returns subgraph induced on nodes in nbunch
+    # the induced subgraph contains the nodes in nbunch
+    # and the edges between those nodes
+    H = @constructor() # create new graph
+    for n in nbunch
+      H.node[n] = @node[n]
+    H_adj = H.adj
+    self_adj = @.adj
+    # add nodes and edges (undirected method)
+    for n in H.node
+      Hnbrs = {}
+      H_adj[n] = Hnbrs
+      for own nbr, d of self_adj[n]
+        if nbr of H_adj
+          # add both representations of edge, n-nbr and nbr-n
+          Hnbrs[nbr] = d
+          H_adj[nbr][n] = d
+      H.graph = @graph
+      return H
 
-  nodes_with_selfloops : () ->
-    ###
-    return list of nodes with self loops
-    ###
-    console.log 'TODO: implement this!'
+
+  nodes_with_selfloops : ->
+    # returns list of nodes with self loops
 
   selfloop_edges : (data=false) ->
-    ###
-    return a list of selfloop edges
-    ###
-    console.log 'TODO: implement this!'
 
-  number_of_selfloops : () ->
-    #return number of selfloop edges
-    console.log 'TODO: Implement this!'
+  nuber_of_selfloops : ->
+    return @selfloop_edges().length
 
-  size : () ->
-    #number of edges
-    console.log 'TODO: implement this!'
+  size : (weight=null) ->
+    # returns the number of edges
+    # weight - edge attribute that holds numerical
+    # value as weight. If null, then each edge has weight = 1
+    sum = 0
+    degrees = @degree(null, weight)
+    for [n,val] in degrees
+      s += val
+    sum /=2
 
-  number_of_edges : (self, u=null, v=null) ->
-    ###
-    returns number of edges between u and v
-    otherwise if not specified, returns total number of edges for all nodes
+  number_of_edges : (u=null, v=null) ->
+    # if u,v are specified, returns number of edges between
+    # the two nodes. Otherwise return total number of all edges.
+    if u is null
+      @size()
+    if v in @adj[u]
+      1
+    else
+      0
 
-    ###
-    console.log 'TODO: implement this!'
+  add_star : (nodes, attr) ->
+    # add a star
+    # first node in nodes is the middle of the star and is connected
+    # to all other nodes
+    v = nodes[0]
+    edges = ([v,n] for n in nodes[1..])
+    @add_edges_from(edges, attr)
 
-  add_star : (self, nodes, attr={}) ->
-    ###
-    adds a star. First node is middle of star. It is connected to all other nodes
+  add_path : (nodes, attr) ->
+    # add a path
+    edges = helpers.zip nodes[...-1], nodes[1..]
+    @add_edges_from(edges, attr)
 
-    this function is currently un-tested
-    ###
-    console.log 'warning - this function has not been tested'
-    nlist = _list(nodes)
-    v = nlist[0]
-    edges = ([v,n] for i,n in nlist[1..])
-    @.add_edges_from(edges,attr)
+  add_cycle : (nodes) ->
+    edges = helpers.zip nodes, nodes[1..].concat(nodes[0])
+    @add_edges_from(edges, attr)
 
-  add_path : (nodes, attr={}) ->
-    ###
-    add a path.
-    path constructed from nodes in order and added to the graph
-    ###
-    console.log 'TOOD: implement this!'
-
-  add_cycle : (nodes, attr={}) ->
-    ###
-    add a cycle
-    ###
-    console.log 'TODO: implement this!'
-
+module.exports = Graph
