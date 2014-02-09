@@ -1,0 +1,33 @@
+{
+  "name": "graphjs",
+  "version": "0.0.0",
+  "description": "Library for representing complex mathematical graph structures",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "var g = require('graphjs').Graph();"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ericjang/graphjs.git"
+  },
+  "keywords": [
+    "math",
+    "graph",
+    "networkx",
+    "digraph",
+    "nodes"
+  ],
+  "dependencies" : {
+    "stitch" : "0.3.3"
+  },
+  "author": "Eric Jang",
+  "license": "BSD",
+  "readmeFilename": "README.md",
+  "gitHead": "1d592894af8755b451b8759a9cd9163036fd61be",
+  "bugs": {
+    "url": "https://github.com/ericjang/graphjs/issues"
+  }
+}
