@@ -20,9 +20,6 @@
     "digraph",
     "nodes"
   ],
-  "dependencies" : {
-    "stitch" : "0.3.3"
-  },
   "author": "Eric Jang",
   "license": "BSD",
   "readmeFilename": "README.md",
