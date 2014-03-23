@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="300px" height="185px" viewBox="0 0 300 185" enable-background="new 0 0 300 185" xml:space="preserve">
+<circle fill="#FFFFFF" stroke="#000000" stroke-width="3" stroke-miterlimit="10" cx="69.555" cy="95.273" r="51.47"/>
+<rect x="14.633" y="84.731" fill="none" width="110.03" height="58.799"/>
+<text transform="matrix(1 0 0 1 31.6792 104.4863)" font-family="'Garamond'" font-size="30">Graph</text>
+<circle fill="#FFFFFF" stroke="#000000" stroke-width="3" stroke-miterlimit="10" cx="228.555" cy="95.273" r="51.471"/>
+<rect x="173.633" y="84.731" fill="none" width="110.03" height="58.799"/>
+<text transform="matrix(1 0 0 1 216.4609 104.4863)" font-family="'Garamond'" font-size="30">JS</text>
+<path fill="none" d="M190,49"/>
+<path fill="none" d="M111,49"/>
+<g>
+	<g>
+		<path fill="none" stroke="#000000" stroke-width="5" stroke-miterlimit="10" d="M106.7,50.227
+			c20.418-18.708,49.46-20.363,71.213-5.66"/>
+		<g>
+			<polygon points="188.599,53.807 168.108,47.31 176.941,44.088 178.521,34.821 			"/>
+		</g>
+	</g>
+</g>
+<g>
+	<g>
+		<path fill="none" stroke="#000000" stroke-width="5" stroke-miterlimit="10" d="M190.599,141.297
+			c-20.419,18.708-49.46,20.363-71.213,5.66"/>
+		<g>
+			<polygon points="108.7,137.717 129.19,144.214 120.357,147.436 118.778,156.702 			"/>
+		</g>
+	</g>
+</g>
+</svg>

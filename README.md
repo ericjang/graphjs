@@ -1,6 +1,6 @@
-# GraphJS
+<img src="images/GraphJS-logo.svg" alt="GraphJS logo" style="display:block; margin-left:auto; margin-right:auto">
 
-GraphJS is a framework for representing mathematical graphs in JavaScript, inspired by the popular <a href='http://networkx.lanl.gov'>NetworkX</a> library for Python. 
+GraphJS is a framework for representing mathematical graphs in JavaScript. It is more or less a direct port of the popular <a href='http://networkx.lanl.gov'>NetworkX</a> Python library. Such JavaScript, very math, etc. etc.
 
 ## Features
 
@@ -10,6 +10,48 @@ GraphJS is a framework for representing mathematical graphs in JavaScript, inspi
 - API is similar to NetworkX, with support for core classes and algorithms.
 - Works in Node.JS and Browser
 - Open-source BSD License
+- Synchronous/Asynchronous APIs
+
+
+## Installation
+
+The entire library ships in a single file. You can include this directly in Node.JS or within the Browser.
+
+node.js:
+
+```
+npm install GraphJS
+GraphJS = require('GraphJS'); // or require('./graph.min.js')
+```
+
+browser:
+```html
+<script src='graph.min.js'></script>
+<script>
+	var g = GraphJS.Graph();
+</script>
+```
+No external dependencies are required.
+
+
+
+## Building GraphJS from Source
+
+The source is written in CoffeeScript. If you only need a few classes/algorithms from GraphJS, you can build GraphJS to only include the features you want. 
+
+To compile for the browser, install <a href="http://browserify.org/">browserify</a> and <a href="https://github.com/jnordberg/coffeeify">coffeeify</a> and build using the following:
+
+```
+$ browserify -t coffeeify --extension=".coffee" index.coffee > graph.min.js
+```
+
+### GraphJS.structures
+Choose which type of graph is best suited for your application:
+
+- `Graph`: undirected graph with self-loops (basic)
+- `DiGraph`: directed graph with self-loops
+- `MultiGraph`: undirected graphs with self loops and parallel edges
+- `MultiDiGraph`: directed graph with self loops and parallel edges
 
 <table>
 	<tr>
@@ -24,32 +66,6 @@ GraphJS is a framework for representing mathematical graphs in JavaScript, inspi
 	</tr>
 
 </table>
-
-## Usage
-
-node.js:
-
-```
-npm install GraphJS
-GraphJS = require('GraphJS');
-```
-
-browser:
-```html
-<script src='graphjs-browser.min.js'></script>
-<script>
-	var g = GraphJS.Graph();
-</script>
-```
-No external dependencies are required.
-
-### GraphJS.structures
-Choose which type of graph is best suited for your application:
-
-- `Graph`: undirected graph with self-loops (basic)
-- `DiGraph`: directed graph with self-loops
-- `MultiGraph`: undirected graphs with self loops and parallel edges
-- `MultiDiGraph`: directed graph with self loops and parallel edges
 
 ### Inheriting Graphs
 Modeling a social network is easy:
@@ -67,9 +83,9 @@ var exampleNetwork = new SocialNetwork();
 
 ```
 
-## GraphJS-NetworkX Compatibility Chart
+## GraphJS-NetworkX Compatibility Notes
 
-<!-- TODO!! -->
+TODO
 
 ## How You Can Help
 
@@ -81,7 +97,7 @@ You can support this project in several ways:
 	- Source code is written in CoffeeScript, which is syntactically similar to Python.
 	- Read <a href='http://networkx.lanl.gov'>NetworkX documentation</a> to understand GraphJS's desired architecture. 
 	- Implement a feature or two and submit a pull request.
-3. You can buy me a coffee! Here is a bitcoin donation link:
+3. You can buy me a donut! Here is a bitcoin donation link:
 <script src="http://coinwidget.com/widget/coin.js"></script>
 <script>
 CoinWidgetCom.go({

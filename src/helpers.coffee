@@ -24,20 +24,18 @@ exports.merge = exports.extend
 
 # delete a key in obj
 exports.del = (obj, key) ->
-  val =  obj[key]
   delete obj[key]
-  val
 
 exports.keys = (obj) ->
-  [key for own key, val of obj]
+  (key for own key, val of obj)
 
 exports.values = (obj) ->
-  [val for own key, val of obj]
+  (val for own key, val of obj)
 
 exports.items = (obj) ->
   # bar = {'1':2,'ass':1}
   # items(bar) = [['1',2],['ass',1]]
-  [[key,val] for own key, val of obj]
+  ([key,val] for own key, val of obj)
 
 # hail Douglas Crockford
 exports.typeIsArray = ( value ) ->

@@ -35,13 +35,13 @@ class Graph
   #   attr : keyword arguments, optional (default= no attributes)
   #       Attributes to add to graph as key=value pairs.
   constructor: (data=null, attr={}) ->
-    @.graph = {}
-    @.node = {}
-    @.adj = {}
+    @graph = {}
+    @node = {}
+    @adj = {}
     if data isnt null
       convert.to_graphjs_graph(data , @)  # this isn't implemented quite yet
-    helpers.update @.graph, attr
-    @.edge = @.adj
+    helpers.update @graph, attr
+    @edge = @adj
 
   name : (s) ->
     if s is undefined
@@ -51,34 +51,41 @@ class Graph
 
   add_node : (n, attr_dict=null, attr={})->
     # add a single node n and update node attributes
-    if actr_dict is null 
+    if attr_dict is null 
       attr_dict = attr
     else 
       try
         helpers.update attr_dict, attr  
       catch
         console.log 'attr_dict must be a dictionary!'
-    if n not of @.node
-      @.adj[n] = {}
-      @.node[n] = attr_dict
+    if n not of @node
+      @adj[n] = {}
+      @node[n] = attr_dict
     else
-      helpers.update @.node[n], attr_dict
+      helpers.update @node[n], attr_dict
 
 
   add_nodes_from : (nodes, attr={})->
     # add multiple nodes
     for n in nodes
-      @.add_node(n, attr)
+      @add_node(n, attr)
 
   remove_node : (n) ->
     # removes node n and all adjacent edges
     try
       helpers.del @node, n
+      console.log @adj[n]
       for u in helpers.keys(@adj[n])
+        console.log u
         helpers.del @adj[u][n]
       helpers.del @adj[n]
     catch error
       console.log error
+
+  remove_nodes_from : (nodes) ->
+    # removes multiple nodes
+    for n of @nodes
+      @remove_node(n)
 
   nodes : (data=false) ->
     # returns list of nodes in graph
@@ -155,7 +162,7 @@ class Graph
       ne = e.length
       switch ne
         when 3 then [u,v,dd] = e
-        when 2 then [u,v,dd] = [e,{}]
+        when 2 then [u,v,dd] = [e[0],e[1],{}]
         else
           console.log "each edge must be a 2-array or 3-array"
       if u not of @node
@@ -267,9 +274,9 @@ class Graph
   is_directed : ->
     false
 
-  # to_directed : ->
+  to_directed : ->
   #   # return a directed representation of the graph
-  #   # TODO
+  #   # TODO, not implemented yet. 
 
   to_undirected : ->
     helpers.deepcopy @
@@ -282,7 +289,7 @@ class Graph
     for n in nbunch
       H.node[n] = @node[n]
     H_adj = H.adj
-    self_adj = @.adj
+    self_adj = @adj
     # add nodes and edges (undirected method)
     for n in H.node
       Hnbrs = {}
@@ -298,8 +305,10 @@ class Graph
 
   nodes_with_selfloops : ->
     # returns list of nodes with self loops
+    # TODO
 
   selfloop_edges : (data=false) ->
+    # TODO
 
   nuber_of_selfloops : ->
     return @selfloop_edges().length
