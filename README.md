@@ -33,9 +33,9 @@ browser:
 ```
 No external dependencies are required.
 
-
-
 ## Building GraphJS from Source
+
+Note: this feature is not quite ready yet.
 
 The source is written in CoffeeScript. If you only need a few classes/algorithms from GraphJS, you can build GraphJS to only include the features you want. 
 
